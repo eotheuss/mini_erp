@@ -180,7 +180,7 @@ $coupons = getCoupons($conn);
                     </li>
                 </ul>
             </div>
-        </div>
+        </div> 
     </nav>
 
     <div class="container mt-4">
