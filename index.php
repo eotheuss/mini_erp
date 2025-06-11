@@ -17,13 +17,12 @@ $products = getProducts($conn);
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-     <style>
-        body {
+    <style>
+        body { 
             font-family: 'Poppins', sans-serif;
             background-color: #f8f9fa;
             color: #333;
         }
-
         h1, h2 {
             color: #0056b3;
             font-weight: 600;
@@ -142,6 +141,26 @@ $products = getProducts($conn);
 </head>
 
 <body>
+    <!-- Barra de Navegação -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.php">Mini ERP</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php">Produtos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="coupons.php">Cupons</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container mt-4">
         <h1>Produtos</h1>
 
@@ -218,7 +237,7 @@ $products = getProducts($conn);
         </div>
 
     </div>
-<br><br><br>
+
     <script>
     $(document).ready(function() {
         // Função para atualizar a lista de produtos na página
@@ -292,52 +311,6 @@ $products = getProducts($conn);
                     alert("Erro ao adicionar ao carrinho.");
                 }
             });
-        });
-
-        $('#cep').blur(function () {
-            var cep = $(this).val().replace(/\D/g, '');
-            if (cep != "") {
-                var validacep = /^[0-9]{8}$/;
-                if (validacep.test(cep)) {
-                    // Exibe o indicador de carregamento
-                    $("#loading").show();
-
-                    $.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function (dados) {
-                        // Oculta o indicador de carregamento
-
-                        if (!("erro" in dados)) {
-                            $("#endereco").val(dados.logradouro);
-                            $("#bairro").val(dados.bairro);
-                            $("#cidade").val(dados.localidade);
-                            $("#estado").val(dados.uf);
-                        } else {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Oops...",
-                                text: "CEP não encontrado!",
-                            });
-                        }
-                        $("#loading").hide();   
-                    }).fail(function () {
-                        // Oculta o indicador de carregamento em caso de erro
-                        $("#loading").hide();
-                        Swal.fire({
-                            icon: "error",
-                            title: "Oops...",
-                            text: "Erro ao buscar CEP. Tente novamente mais tarde",
-                        });
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: "Formato de CEP inválido!",
-                    });
-                }
-            }
-        });
-        $(document).ready(function () {
-            $('#cep').mask('00000-000');
         });
     });
     </script>
