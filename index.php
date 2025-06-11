@@ -15,6 +15,130 @@ $products = getProducts($conn);
     <title>Mini ERP - Produtos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+     <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        h1, h2 {
+            color: #0056b3;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background-color: #0056b3;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #004494;
+        }
+
+        .btn-warning {
+            background-color: #f39c12;
+            border: none;
+        }
+
+        .btn-warning:hover {
+            background-color: #d87a09;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        table {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        table thead {
+            background-color: #0056b3;
+            color: #fff;
+        }
+
+        table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #0056b3;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .form-control {
+            border-radius: 8px;
+        }
+
+        .table-bordered th, .table-bordered td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .container {
+            margin-top: 40px;
+        }
+
+        #cart-container {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .buy-form {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .buy-form input {
+            border-radius: 8px;
+            margin-right: 8px;
+        }
+
+        .buy-button {
+            border-radius: 8px;
+        }
+    </style>
 </head>
 
 <body>
@@ -24,6 +148,9 @@ $products = getProducts($conn);
         <!-- Formulário para adicionar/editar produto -->
         <form id="product-form" class="mb-4">
             <input type="hidden" name="product_id" value="" id="product_id" />
+            <div id="loading" style="display: none;">
+                <div class="loader"></div>
+            </div>
             <div class="row">
                 <div class="col-md-3">
                     <input type="text" name="name" class="form-control" placeholder="Nome" required id="name" />
@@ -91,7 +218,7 @@ $products = getProducts($conn);
         </div>
 
     </div>
-
+<br><br><br>
     <script>
     $(document).ready(function() {
         // Função para atualizar a lista de produtos na página
@@ -165,6 +292,52 @@ $products = getProducts($conn);
                     alert("Erro ao adicionar ao carrinho.");
                 }
             });
+        });
+
+        $('#cep').blur(function () {
+            var cep = $(this).val().replace(/\D/g, '');
+            if (cep != "") {
+                var validacep = /^[0-9]{8}$/;
+                if (validacep.test(cep)) {
+                    // Exibe o indicador de carregamento
+                    $("#loading").show();
+
+                    $.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function (dados) {
+                        // Oculta o indicador de carregamento
+
+                        if (!("erro" in dados)) {
+                            $("#endereco").val(dados.logradouro);
+                            $("#bairro").val(dados.bairro);
+                            $("#cidade").val(dados.localidade);
+                            $("#estado").val(dados.uf);
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: "CEP não encontrado!",
+                            });
+                        }
+                        $("#loading").hide();   
+                    }).fail(function () {
+                        // Oculta o indicador de carregamento em caso de erro
+                        $("#loading").hide();
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Erro ao buscar CEP. Tente novamente mais tarde",
+                        });
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Formato de CEP inválido!",
+                    });
+                }
+            }
+        });
+        $(document).ready(function () {
+            $('#cep').mask('00000-000');
         });
     });
     </script>
